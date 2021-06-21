@@ -7,9 +7,9 @@ import org.jbake.app.Parser;
 import org.jbake.app.Renderer;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpTest() {
         //switch to PLOCAL mode for this test class as Travis sometimes runs out of memory
         db.close();
@@ -77,7 +77,7 @@ public class GroovyMarkupTemplateEngineRenderingTest extends AbstractTemplateEng
         content.setUri("/" + filename);
         renderer.render(content);
         File outputFile = new File(destinationFolder, filename);
-        Assert.assertTrue(outputFile.exists());
+        Assertions.assertTrue(outputFile.exists());
 
         // verify
         String output = FileUtils.readFileToString(outputFile, Charset.defaultCharset());

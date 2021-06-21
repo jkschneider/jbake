@@ -23,7 +23,7 @@
  */
 package org.jbake.app.template;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 /**
  *
@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
  */
 public class GroovyTemplateEngineRenderingTest extends AbstractTemplateEngineRenderingTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         //setUpDatabase(StorageType.PLOCAL);
     }

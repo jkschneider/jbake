@@ -24,15 +24,15 @@
 package org.jbake.app.template;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author jdlee
@@ -76,10 +76,10 @@ public class FreemarkerTemplateEngineRenderingTest extends AbstractTemplateEngin
         renderer.renderIndexPaging("index.html");
 
         File paginatedFile = new File(destinationFolder, "index2.html");
-        assertFalse("paginated file is not rendered", paginatedFile.exists());
+        assertFalse(paginatedFile.exists(), "paginated file is not rendered");
 
         File indexFile = new File(destinationFolder, "index.html");
-        assertTrue("index file exists", indexFile.exists());
+        assertTrue(indexFile.exists(), "index file exists");
 
     }
 

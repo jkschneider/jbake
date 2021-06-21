@@ -4,11 +4,10 @@ import org.apache.commons.vfs2.util.Os;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,22 +19,22 @@ public class ProjectWebsiteTest {
 
     private static final String WEBSITE_REPO_URL = "https://github.com/jbake-org/jbake.org.git";
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
     private File projectFolder;
     private File outputFolder;
     private String jbakeExecutable;
     private BinaryRunner runner;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, GitAPIException {
-        Assume.assumeTrue("JDK 7 is not supported for this test", !isJava7());
+        Assumptions.assumeTrue(!isJava7(), "JDK 7 is not supported for this test");
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
         } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
         }
-        projectFolder = folder.newFolder("project");
+        projectFolder = newFolder(folder, "project");
         new File(projectFolder, "templates");
         outputFolder = new File(projectFolder, "output");
 
@@ -67,6 +66,15 @@ public class ProjectWebsiteTest {
         assertThat(process.exitValue()).isEqualTo(0);
         assertThat(new File(outputFolder, "index.html")).exists();
         process.destroy();
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 
 }

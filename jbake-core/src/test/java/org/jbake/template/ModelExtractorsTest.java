@@ -1,19 +1,15 @@
 package org.jbake.template;
 
 import org.jbake.model.DocumentTypes;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ModelExtractorsTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         ModelExtractors.getInstance().reset();
     }
@@ -37,7 +33,7 @@ public class ModelExtractorsTest {
             "db",
             "tag_posts",
             "tags",
-            "tagged_documents",
+            "tagged_documents"
         };
 
         for (String aKey : expectedKeys) {
@@ -73,10 +69,11 @@ public class ModelExtractorsTest {
 
     @Test
     public void shouldThrowAnExceptionIfDocumentTypeIsUnknown() {
-        thrown.expect(UnsupportedOperationException.class);
+        assertThrows(UnsupportedOperationException.class, () -> {
 
-        String unknownDocumentType = "unknown";
-        ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType);
+            String unknownDocumentType = "unknown";
+            ModelExtractors.getInstance().registerExtractorsForCustomTypes(unknownDocumentType);
+        });
     }
 
     @Test

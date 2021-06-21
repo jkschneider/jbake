@@ -5,16 +5,11 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 public class IndexRendererTest {
 
@@ -65,22 +60,24 @@ public class IndexRendererTest {
     }
 
 
-    @Test(expected = RenderingException.class)
+    @Test
     public void propagatesRenderingException() throws Exception {
-        IndexRenderer renderer = new IndexRenderer();
+        assertThrows(RenderingException.class, () -> {
+            IndexRenderer renderer = new IndexRenderer();
 
-        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
-        when(configuration.getRenderIndex()).thenReturn(true);
-        when(configuration.getIndexFileName()).thenReturn("mockindex.html");
+            JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+            when(configuration.getRenderIndex()).thenReturn(true);
+            when(configuration.getIndexFileName()).thenReturn("mockindex.html");
 
-        ContentStore contentStore = mock(ContentStore.class);
-        Renderer mockRenderer = mock(Renderer.class);
+            ContentStore contentStore = mock(ContentStore.class);
+            Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
+            doThrow(new Exception()).when(mockRenderer).renderIndex(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
+            renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, never()).renderIndex(anyString());
+            verify(mockRenderer, never()).renderIndex(anyString());
+        });
     }
 
 

@@ -1,14 +1,10 @@
 package org.jbake;
 
 import org.apache.commons.vfs2.util.Os;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,47 +12,46 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
-public class BuiltInProjectsTest {
 
-    @Parameter
+public class BuiltInProjectsTest {
     public String projectName;
-    @Parameter(1)
     public String extension;
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
     private File projectFolder;
     private File templateFolder;
     private File outputFolder;
     private String jbakeExecutable;
     private BinaryRunner runner;
 
-    @Parameters(name = " {0} ")
+
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            {"thymeleaf", "thyme"},
-            {"freemarker", "ftl"},
-            {"jade", "jade"},
-            {"groovy", "gsp"},
-            {"groovy-mte", "tpl"}
+                {"thymeleaf", "thyme"},
+                {"freemarker", "ftl"},
+                {"jade", "jade"},
+                {"groovy", "gsp"},
+                {"groovy-mte", "tpl"}
         });
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         if (Os.isFamily(Os.OS_FAMILY_WINDOWS)) {
             jbakeExecutable = new File("build\\install\\jbake\\bin\\jbake.bat").getAbsolutePath();
         } else {
             jbakeExecutable = new File("build/install/jbake/bin/jbake").getAbsolutePath();
         }
-        projectFolder = folder.newFolder("project");
+        projectFolder = newFolder(folder, "project");
         templateFolder = new File(projectFolder, "templates");
         outputFolder = new File(projectFolder, "output");
         runner = new BinaryRunner(projectFolder);
     }
 
-    @Test
-    public void shouldBakeWithProject() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = " {0} ")
+    public void shouldBakeWithProject(String projectName, String extension) throws Exception {
+        initBuiltInProjectsTest(projectName, extension);
         shouldInitProject(projectName, extension);
         shouldBakeProject();
     }
@@ -74,6 +69,20 @@ public class BuiltInProjectsTest {
         assertThat(process.exitValue()).isEqualTo(0);
         assertThat(new File(outputFolder, "index.html")).exists();
         process.destroy();
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
+    }
+
+    public void initBuiltInProjectsTest(String projectName, String extension) {
+        this.projectName = projectName;
+        this.extension = extension;
     }
 
 }

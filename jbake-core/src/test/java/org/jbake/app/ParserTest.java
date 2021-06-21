@@ -3,15 +3,14 @@ package org.jbake.app;
 import org.jbake.TestUtils;
 import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
-import org.jbake.model.DocumentModel;
 import org.jbake.app.configuration.PropertyList;
+import org.jbake.model.DocumentModel;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -24,8 +23,8 @@ import static org.jbake.app.configuration.PropertyList.TAG_SANITIZE;
 
 public class ParserTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
 
     private DefaultJBakeConfiguration config;
     private Parser parser;
@@ -53,24 +52,24 @@ public class ParserTest {
     private String customHeaderSeparator;
 
 
-    @Before
+    @BeforeEach
     public void createSampleFile() throws Exception {
         rootPath = TestUtils.getTestResourcesAsSourceFolder();
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(rootPath);
         parser = new Parser(config);
 
-        validHTMLFile = folder.newFile("valid.html");
+        validHTMLFile = File.createTempFile("valid.html", null, folder);
         PrintWriter out = new PrintWriter(validHTMLFile);
         out.println(validHeader);
         out.println("<p>This is a test.</p>");
         out.close();
 
-        invalidHTMLFile = folder.newFile("invalid.html");
+        invalidHTMLFile = File.createTempFile("invalid.html", null, folder);
         out = new PrintWriter(invalidHTMLFile);
         out.println(invalidHeader);
         out.close();
 
-        validMarkdownFileWithCustomHeader = folder.newFile("validMdCustomHeader.md");
+        validMarkdownFileWithCustomHeader = File.createTempFile("validMdCustomHeader.md", null, folder);
 
         customHeaderSeparator = "---------------------------------------";
         out = new PrintWriter(validMarkdownFileWithCustomHeader);
@@ -87,7 +86,7 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
-        validMarkdownFileWithDefaultStatus = folder.newFile("validMdDefaultStatus.md");
+        validMarkdownFileWithDefaultStatus = File.createTempFile("validMdDefaultStatus.md", null, folder);
 
         out = new PrintWriter(validMarkdownFileWithDefaultStatus);
         out.println("title=Custom Header separator");
@@ -102,7 +101,7 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
-        validMarkdownFileWithDefaultTypeAndStatus = folder.newFile("validMdDefaultTypeAndStatus.md");
+        validMarkdownFileWithDefaultTypeAndStatus = File.createTempFile("validMdDefaultTypeAndStatus.md", null, folder);
 
         out = new PrintWriter(validMarkdownFileWithDefaultTypeAndStatus);
         out.println("title=Custom Header separator");
@@ -117,7 +116,7 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
-        invalidMarkdownFileWithoutDefaultStatus = folder.newFile("invalidMdWithoutDefaultStatus.md");
+        invalidMarkdownFileWithoutDefaultStatus = File.createTempFile("invalidMdWithoutDefaultStatus.md", null, folder);
 
         out = new PrintWriter(invalidMarkdownFileWithoutDefaultStatus);
         out.println("title=Custom Header separator");
@@ -132,7 +131,7 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
-        invalidMDFile = folder.newFile("invalidMd.md");
+        invalidMDFile = File.createTempFile("invalidMd.md", null, folder);
 
         out = new PrintWriter(invalidMDFile);
         out.println(invalidHeader);
@@ -145,12 +144,12 @@ public class ParserTest {
         out.println("* List");
         out.close();
 
-        invalidExtensionFile = folder.newFile("invalid.invalid");
+        invalidExtensionFile = File.createTempFile("invalid.invalid", null, folder);
         out = new PrintWriter(invalidExtensionFile);
         out.println("invalid content");
         out.close();
 
-        validHTMLWithJSONFile = folder.newFile("validHTMLWithJSONFile.html");
+        validHTMLWithJSONFile = File.createTempFile("validHTMLWithJSONFile.html", null, folder);
         out = new PrintWriter(validHTMLWithJSONFile);
         out.println("title=This is a Title = This is a valid Title");
         out.println("status=draft");
@@ -162,7 +161,7 @@ public class ParserTest {
         out.println("Sample Body");
         out.close();
 
-        validAsciiDocWithJSONFile = folder.newFile("validAsciiDocWithJSONFile.ad");
+        validAsciiDocWithJSONFile = File.createTempFile("validAsciiDocWithJSONFile.ad", null, folder);
         out = new PrintWriter(validAsciiDocWithJSONFile);
         out.println("title=This is a Title = This is a valid Title");
         out.println("status=draft");
@@ -177,7 +176,7 @@ public class ParserTest {
         out.println("JBake now supports AsciiDoc.");
         out.close();
 
-        validAsciiDocWithADHeaderJSONFile = folder.newFile("validAsciiDocWithADHeaderJSONFile.ad");
+        validAsciiDocWithADHeaderJSONFile = File.createTempFile("validAsciiDocWithADHeaderJSONFile.ad", null, folder);
         out = new PrintWriter(validAsciiDocWithADHeaderJSONFile);
         out.println("= Hello: AsciiDoc!");
         out.println("Test User <user@test.org>");
@@ -190,7 +189,7 @@ public class ParserTest {
         out.println("JBake now supports AsciiDoc.");
         out.close();
 
-        validaAsciidocWithUnsanitizedHeader = folder.newFile("validAsciidocWithUnsanitizedHeader.adoc");
+        validaAsciidocWithUnsanitizedHeader = File.createTempFile("validAsciidocWithUnsanitizedHeader.adoc", null, folder);
         out = new PrintWriter(validaAsciidocWithUnsanitizedHeader, "UTF-8");
         // Simulating a \uFEFF Byte order Marker in utf-8
         out.print("\uFEFF");
@@ -211,29 +210,29 @@ public class ParserTest {
     @Test
     public void parseValidHTMLFile() {
         DocumentModel documentModel = parser.processFile(validHTMLFile);
-        Assert.assertNotNull(documentModel);
-        Assert.assertEquals("draft", documentModel.getStatus());
-        Assert.assertEquals("post", documentModel.getType());
-        Assert.assertEquals("This is a Title = This is a valid Title", documentModel.getTitle());
-        Assert.assertNotNull(documentModel.getDate());
+        Assertions.assertNotNull(documentModel);
+        Assertions.assertEquals("draft", documentModel.getStatus());
+        Assertions.assertEquals("post", documentModel.getType());
+        Assertions.assertEquals("This is a Title = This is a valid Title", documentModel.getTitle());
+        Assertions.assertNotNull(documentModel.getDate());
         Calendar cal = Calendar.getInstance();
         cal.setTime(documentModel.getDate());
-        Assert.assertEquals(8, cal.get(Calendar.MONTH));
-        Assert.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
-        Assert.assertEquals(2013, cal.get(Calendar.YEAR));
+        Assertions.assertEquals(8, cal.get(Calendar.MONTH));
+        Assertions.assertEquals(2, cal.get(Calendar.DAY_OF_MONTH));
+        Assertions.assertEquals(2013, cal.get(Calendar.YEAR));
 
     }
 
     @Test
     public void parseInvalidHTMLFile() {
         DocumentModel documentModel = parser.processFile(invalidHTMLFile);
-        Assert.assertNull(documentModel);
+        Assertions.assertNull(documentModel);
     }
 
     @Test
     public void parseInvalidExtension(){
         DocumentModel documentModel = parser.processFile(invalidExtensionFile);
-        Assert.assertNull(documentModel);
+        Assertions.assertNull(documentModel);
     }
 
 
@@ -242,9 +241,9 @@ public class ParserTest {
         config.setHeaderSeparator(customHeaderSeparator);
 
         DocumentModel documentModel = parser.processFile(validMarkdownFileWithCustomHeader);
-        Assert.assertNotNull(documentModel);
-        Assert.assertEquals("draft", documentModel.getStatus());
-        Assert.assertEquals("post", documentModel.getType());
+        Assertions.assertNotNull(documentModel);
+        Assertions.assertEquals("draft", documentModel.getStatus());
+        Assertions.assertEquals("post", documentModel.getType());
         assertThat(documentModel.getBody())
                 .contains("<p>A paragraph</p>");
 
@@ -255,10 +254,10 @@ public class ParserTest {
         config.setDefaultStatus("published");
 
         DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultStatus);
-        Assert.assertNotNull(documentModel);
-        Assert.assertEquals("published", documentModel.getStatus());
-        Assert.assertEquals("post", documentModel.getType());
-        Assert.assertEquals(true, documentModel.getCached());
+        Assertions.assertNotNull(documentModel);
+        Assertions.assertEquals("published", documentModel.getStatus());
+        Assertions.assertEquals("post", documentModel.getType());
+        Assertions.assertEquals(true, documentModel.getCached());
     }
 
     @Test
@@ -267,9 +266,9 @@ public class ParserTest {
         config.setDefaultType("page");
 
         DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus);
-        Assert.assertNotNull(documentModel);
-        Assert.assertEquals("published", documentModel.getStatus());
-        Assert.assertEquals("page", documentModel.getType());
+        Assertions.assertNotNull(documentModel);
+        Assertions.assertEquals("published", documentModel.getStatus());
+        Assertions.assertEquals("page", documentModel.getType());
     }
 
     @Test
@@ -278,7 +277,7 @@ public class ParserTest {
         config.setDefaultType("page");
 
         DocumentModel documentModel = parser.processFile(validMarkdownFileWithDefaultTypeAndStatus);
-        Assert.assertEquals(false, documentModel.getCached());
+        Assertions.assertEquals(false, documentModel.getCached());
     }
 
     @Test
@@ -287,13 +286,13 @@ public class ParserTest {
         config.setDefaultType("page");
 
         DocumentModel documentModel = parser.processFile(invalidMarkdownFileWithoutDefaultStatus);
-        Assert.assertNull(documentModel);
+        Assertions.assertNull(documentModel);
     }
 
     @Test
     public void parseInvalidMarkdownFile() {
         DocumentModel documentModel = parser.processFile(invalidMDFile);
-        Assert.assertNull(documentModel);
+        Assertions.assertNull(documentModel);
     }
 
     @Test

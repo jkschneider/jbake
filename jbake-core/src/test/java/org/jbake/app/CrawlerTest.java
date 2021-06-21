@@ -4,18 +4,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.jbake.model.DocumentModel;
-import org.jbake.model.ModelAttributes;
 import org.jbake.model.DocumentTypes;
+import org.jbake.model.ModelAttributes;
 import org.jbake.util.DataFileUtil;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CrawlerTest extends ContentStoreIntegrationTest {
 
@@ -24,8 +23,8 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        Assertions.assertEquals(4, db.getDocumentCount("post"));
+        Assertions.assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList<DocumentModel> results = db.getPublishedPosts();
 
@@ -49,7 +48,7 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
 
         // covers bug #213
         DocumentList<DocumentModel> publishedPostsByTag = db.getPublishedPostsByTag("blog");
-        Assert.assertEquals(3, publishedPostsByTag.size());
+        Assertions.assertEquals(3, publishedPostsByTag.size());
     }
 
     @Test
@@ -59,12 +58,12 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         DocumentTypes.addDocumentType(config.getDataFileDocType());
         db.updateSchema();
         crawler.crawlDataFiles();
-        Assert.assertEquals(1, db.getDocumentCount("data"));
+        Assertions.assertEquals(1, db.getDocumentCount("data"));
 
         DataFileUtil util = new DataFileUtil(db, "data");
         Map<String, Object> data = util.get("videos.yaml");
-        Assert.assertFalse(data.isEmpty());
-        Assert.assertNotNull(data.get("data"));
+        Assertions.assertFalse(data.isEmpty());
+        Assertions.assertNotNull(data.get("data"));
     }
 
     @Test
@@ -76,17 +75,17 @@ public class CrawlerTest extends ContentStoreIntegrationTest {
         Crawler crawler = new Crawler(db, config);
         crawler.crawl();
 
-        Assert.assertEquals(4, db.getDocumentCount("post"));
-        Assert.assertEquals(3, db.getDocumentCount("page"));
+        Assertions.assertEquals(4, db.getDocumentCount("post"));
+        Assertions.assertEquals(3, db.getDocumentCount("page"));
 
         DocumentList<DocumentModel> documents = db.getPublishedPosts();
 
         for (DocumentModel model : documents) {
             String noExtensionUri = "blog/\\d{4}/" + FilenameUtils.getBaseName(model.getFile()) + "/";
 
-            Assert.assertThat(model.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
-            Assert.assertThat(model.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
-            Assert.assertThat(model.getRootPath(), is("../../../"));
+            assertThat(model.getNoExtensionUri(), RegexMatcher.matches(noExtensionUri));
+            assertThat(model.getUri(), RegexMatcher.matches(noExtensionUri + "index\\.html"));
+            assertThat(model.getRootPath(), is("../../../"));
         }
     }
 

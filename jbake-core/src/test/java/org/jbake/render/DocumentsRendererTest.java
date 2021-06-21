@@ -8,11 +8,9 @@ import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
 import org.jbake.model.ModelAttributes;
 import org.jbake.template.RenderingException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -40,7 +38,7 @@ public class DocumentsRendererTest {
     @Captor
     private ArgumentCaptor<DocumentModel> argument;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         MockitoAnnotations.initMocks(this);

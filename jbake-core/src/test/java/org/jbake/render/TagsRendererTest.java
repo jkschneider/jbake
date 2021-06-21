@@ -5,20 +5,15 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 public class TagsRendererTest {
 
@@ -92,22 +87,24 @@ public class TagsRendererTest {
         verify(mockRenderer, times(1)).renderTags(anyString());
     }
 
-    @Test(expected = RenderingException.class)
+    @Test
     public void propogatesRenderingException() throws Exception {
-        TagsRenderer renderer = new TagsRenderer();
+        assertThrows(RenderingException.class, () -> {
+            TagsRenderer renderer = new TagsRenderer();
 
-        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
-        when(configuration.getRenderTags()).thenReturn(true);
-        when(configuration.getTagPathName()).thenReturn("mocktagpath/tag");
+            JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+            when(configuration.getRenderTags()).thenReturn(true);
+            when(configuration.getTagPathName()).thenReturn("mocktagpath/tag");
 
-        ContentStore contentStore = mock(ContentStore.class);
-        Renderer mockRenderer = mock(Renderer.class);
+            ContentStore contentStore = mock(ContentStore.class);
+            Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderTags(anyString());
+            doThrow(new Exception()).when(mockRenderer).renderTags(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
+            renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, never()).renderTags(anyString());
+            verify(mockRenderer, never()).renderTags(anyString());
+        });
     }
 }
 

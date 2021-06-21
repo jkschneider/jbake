@@ -1,8 +1,9 @@
 package org.jbake.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class PagingHelperTest {
@@ -14,7 +15,7 @@ public class PagingHelperTest {
 
         PagingHelper helper = new PagingHelper(total,perPage);
 
-        Assert.assertEquals( expected, helper.getNumberOfPages() );
+        Assertions.assertEquals( expected, helper.getNumberOfPages() );
     }
 
     @Test
@@ -23,7 +24,7 @@ public class PagingHelperTest {
 
         String previousFileName = helper.getPreviousFileName(2);
 
-        Assert.assertThat("", is( previousFileName) );
+        assertThat("", is( previousFileName) );
     }
 
     @Test
@@ -32,7 +33,7 @@ public class PagingHelperTest {
 
         String previousFileName = helper.getPreviousFileName(3);
 
-        Assert.assertThat("2/", is( previousFileName) );
+        assertThat("2/", is( previousFileName) );
     }
 
     @Test
@@ -41,7 +42,7 @@ public class PagingHelperTest {
 
         String previousFileName = helper.getPreviousFileName(1);
 
-        Assert.assertNull( previousFileName );
+        Assertions.assertNull( previousFileName );
     }
 
     @Test
@@ -50,7 +51,7 @@ public class PagingHelperTest {
 
         String nextFileName = helper.getNextFileName(3);
 
-        Assert.assertNull( nextFileName );
+        Assertions.assertNull( nextFileName );
     }
 
     @Test
@@ -59,6 +60,6 @@ public class PagingHelperTest {
 
         String nextFileName = helper.getNextFileName(2);
 
-        Assert.assertThat("3/", is( nextFileName) );
+        assertThat("3/", is( nextFileName) );
     }
 }

@@ -5,16 +5,11 @@ import org.jbake.app.Renderer;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.app.configuration.JBakeConfiguration;
 import org.jbake.template.RenderingException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 public class SitemapRendererTest {
 
@@ -80,22 +75,24 @@ public class SitemapRendererTest {
         verify(mockRenderer, times(1)).renderSitemap(anyString());
     }
 
-    @Test(expected = RenderingException.class)
+    @Test
     public void propogatesRenderingException() throws Exception {
-        SitemapRenderer renderer = new SitemapRenderer();
+        assertThrows(RenderingException.class, () -> {
+            SitemapRenderer renderer = new SitemapRenderer();
 
-        JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
-        when(configuration.getRenderSiteMap()).thenReturn(true);
-        when(configuration.getSiteMapFileName()).thenReturn("mocksitemap.html");
+            JBakeConfiguration configuration = mock(DefaultJBakeConfiguration.class);
+            when(configuration.getRenderSiteMap()).thenReturn(true);
+            when(configuration.getSiteMapFileName()).thenReturn("mocksitemap.html");
 
-        ContentStore contentStore = mock(ContentStore.class);
-        Renderer mockRenderer = mock(Renderer.class);
+            ContentStore contentStore = mock(ContentStore.class);
+            Renderer mockRenderer = mock(Renderer.class);
 
-        doThrow(new Exception()).when(mockRenderer).renderSitemap(anyString());
+            doThrow(new Exception()).when(mockRenderer).renderSitemap(anyString());
 
-        renderer.render(mockRenderer, contentStore, configuration);
+            renderer.render(mockRenderer, contentStore, configuration);
 
-        verify(mockRenderer, never()).renderSitemap(anyString());
+            verify(mockRenderer, never()).renderSitemap(anyString());
+        });
     }
 
 }

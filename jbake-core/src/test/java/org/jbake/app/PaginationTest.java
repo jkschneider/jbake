@@ -26,10 +26,9 @@ package org.jbake.app;
 import org.jbake.FakeDocumentBuilder;
 import org.jbake.model.DocumentModel;
 import org.jbake.model.DocumentTypes;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -41,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class PaginationTest extends ContentStoreIntegrationTest {
 
-    @Before
+    @BeforeEach
     public void setUpOwn() {
         for (String docType : DocumentTypes.getDocumentTypes()) {
             String fileBaseName = docType;
@@ -89,6 +88,6 @@ public class PaginationTest extends ContentStoreIntegrationTest {
             pageCount++;
             start += PER_PAGE;
         }
-        Assert.assertEquals(4, pageCount);
+        Assertions.assertEquals(4, pageCount);
     }
 }

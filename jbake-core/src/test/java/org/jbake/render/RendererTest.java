@@ -7,25 +7,25 @@ import org.jbake.app.configuration.ConfigUtil;
 import org.jbake.app.configuration.DefaultJBakeConfiguration;
 import org.jbake.model.DocumentModel;
 import org.jbake.template.DelegatingTemplateEngine;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RendererTest {
 
-    @Rule
-    public TemporaryFolder folder = new TemporaryFolder();
+    @TempDir
+    public File folder;
     private DefaultJBakeConfiguration config;
     private File outputPath;
 
@@ -35,14 +35,14 @@ public class RendererTest {
     @Mock
     private DelegatingTemplateEngine renderingEngine;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         File sourcePath = TestUtils.getTestResourcesAsSourceFolder();
         if (!sourcePath.exists()) {
             throw new Exception("Cannot find base path for test!");
         }
-        outputPath = folder.newFolder("output");
+        outputPath = newFolder(folder, "output");
         config = (DefaultJBakeConfiguration) new ConfigUtil().loadConfig(sourcePath);
         config.setDestinationFolder(outputPath);
     }
@@ -55,7 +55,7 @@ public class RendererTest {
     @Test
     public void testRenderFileWorksWhenPathHasDotInButFileDoesNot() throws Exception {
 
-        Assume.assumeFalse("Ignore running on Windows", TestUtils.isWindows());
+        Assumptions.assumeFalse(TestUtils.isWindows(), "Ignore running on Windows");
         String FOLDER = "real.path";
 
         final String FILENAME = "about";
@@ -72,5 +72,14 @@ public class RendererTest {
 
         File outputFile = new File(outputPath.getAbsolutePath() + File.separatorChar + FOLDER + File.separatorChar + FILENAME);
         assertThat(outputFile).isFile();
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }
